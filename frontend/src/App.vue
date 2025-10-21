@@ -50,11 +50,23 @@
           <div class="hand">
             <h3>プレイヤー</h3>
             <div class="cards">
-              <div v-for="(card, index) in gameResult?.playerCards" :key="'p' + index" class="card">
-                {{ getCardDisplay(card) }}
+              <div
+                v-for="(card, index) in gameResult?.playerCards"
+                :key="'p' + index"
+                class="card-wrapper"
+                @click="revealCard('player', index)"
+              >
+                <div class="card-flip" :class="{ flipped: isCardRevealed('player', index) }">
+                  <div class="card card-back">
+                    🂠
+                  </div>
+                  <div class="card card-front">
+                    {{ getCardDisplay(card) }}
+                  </div>
+                </div>
               </div>
             </div>
-            <div v-if="gameResult" class="total">
+            <div v-if="gameResult && allCardsRevealed" class="total">
               合計: {{ gameResult.playerTotal }}
             </div>
           </div>
@@ -62,17 +74,38 @@
           <div class="hand">
             <h3>バンカー</h3>
             <div class="cards">
-              <div v-for="(card, index) in gameResult?.bankerCards" :key="'b' + index" class="card">
-                {{ getCardDisplay(card) }}
+              <div
+                v-for="(card, index) in gameResult?.bankerCards"
+                :key="'b' + index"
+                class="card-wrapper"
+                @click="revealCard('banker', index)"
+              >
+                <div class="card-flip" :class="{ flipped: isCardRevealed('banker', index) }">
+                  <div class="card card-back">
+                    🂠
+                  </div>
+                  <div class="card card-front">
+                    {{ getCardDisplay(card) }}
+                  </div>
+                </div>
               </div>
             </div>
-            <div v-if="gameResult" class="total">
+            <div v-if="gameResult && allCardsRevealed" class="total">
               合計: {{ gameResult.bankerTotal }}
             </div>
           </div>
         </div>
 
-        <div v-if="gameResult" class="result-message" :class="'winner-' + gameResult.winner">
+        <div v-if="gameResult && !allCardsRevealed" class="reveal-controls">
+          <button @click="revealNextCard" class="action-button reveal-button">
+            次のカードをめくる
+          </button>
+          <button @click="revealAllCards" class="action-button reveal-all-button">
+            全てめくる
+          </button>
+        </div>
+
+        <div v-if="gameResult && allCardsRevealed" class="result-message" :class="'winner-' + gameResult.winner">
           {{ getResultMessage() }}
         </div>
       </div>
@@ -135,7 +168,7 @@
       </div>
 
       <!-- Next Round Button -->
-      <div v-else class="action-buttons">
+      <div v-else-if="allCardsRevealed" class="action-buttons">
         <button @click="nextRound" class="action-button next-button">
           次のラウンド
         </button>
@@ -212,7 +245,12 @@ export default {
       playerName: '',
       rankings: [],
       roundHistory: [],
-      showCheatModal: false
+      showCheatModal: false,
+      revealedCards: {
+        player: [],
+        banker: []
+      },
+      allCardsRevealed: false
     };
   },
   mounted() {
@@ -307,9 +345,81 @@ export default {
       this.gameResult = null;
       this.selectedBet = null;
       this.currentRound++;
+      this.revealedCards = { player: [], banker: [] };
+      this.allCardsRevealed = false;
 
       if (this.currentRound > 7) {
         this.gameOver = true;
+      }
+    },
+
+    revealCard(hand, index) {
+      if (!this.isCardRevealed(hand, index)) {
+        this.revealedCards[hand].push(index);
+        this.checkAllRevealed();
+      }
+    },
+
+    isCardRevealed(hand, index) {
+      return this.revealedCards[hand].includes(index);
+    },
+
+    revealNextCard() {
+      if (!this.gameResult) return;
+
+      const totalCards = this.gameResult.playerCards.length + this.gameResult.bankerCards.length;
+      const revealedCount = this.revealedCards.player.length + this.revealedCards.banker.length;
+
+      if (revealedCount >= totalCards) {
+        this.allCardsRevealed = true;
+        return;
+      }
+
+      // Reveal cards alternately: P1, B1, P2, B2, etc.
+      const sequence = [];
+      const maxCards = Math.max(this.gameResult.playerCards.length, this.gameResult.bankerCards.length);
+
+      for (let i = 0; i < maxCards; i++) {
+        if (i < this.gameResult.playerCards.length) {
+          sequence.push({ hand: 'player', index: i });
+        }
+        if (i < this.gameResult.bankerCards.length) {
+          sequence.push({ hand: 'banker', index: i });
+        }
+      }
+
+      const nextCard = sequence[revealedCount];
+      if (nextCard) {
+        this.revealCard(nextCard.hand, nextCard.index);
+      }
+    },
+
+    revealAllCards() {
+      if (!this.gameResult) return;
+
+      this.gameResult.playerCards.forEach((_, index) => {
+        if (!this.revealedCards.player.includes(index)) {
+          this.revealedCards.player.push(index);
+        }
+      });
+
+      this.gameResult.bankerCards.forEach((_, index) => {
+        if (!this.revealedCards.banker.includes(index)) {
+          this.revealedCards.banker.push(index);
+        }
+      });
+
+      this.allCardsRevealed = true;
+    },
+
+    checkAllRevealed() {
+      if (!this.gameResult) return;
+
+      const totalCards = this.gameResult.playerCards.length + this.gameResult.bankerCards.length;
+      const revealedCount = this.revealedCards.player.length + this.revealedCards.banker.length;
+
+      if (revealedCount >= totalCards) {
+        this.allCardsRevealed = true;
       }
     },
 
@@ -361,6 +471,8 @@ export default {
       this.gameOver = false;
       this.playerName = '';
       this.roundHistory = [];
+      this.revealedCards = { player: [], banker: [] };
+      this.allCardsRevealed = false;
     },
 
     getCardDisplay(cardValue) {
