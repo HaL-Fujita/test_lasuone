@@ -1,0 +1,423 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  min-height: 100vh;
+  color: #fff;
+}
+
+#app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.game-container {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 20px;
+  padding: 30px;
+  backdrop-filter: blur(10px);
+}
+
+.game-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.game-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.game-info {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.info-card {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 15px 25px;
+  border-radius: 10px;
+  text-align: center;
+  min-width: 150px;
+}
+
+.info-card h3 {
+  font-size: 0.9rem;
+  color: #aaa;
+  margin-bottom: 5px;
+}
+
+.info-card p {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.balance {
+  color: #4CAF50;
+}
+
+.rounds {
+  color: #2196F3;
+}
+
+.cheat-available {
+  color: #FF9800;
+}
+
+.game-table {
+  background: #0a5f0a;
+  border-radius: 15px;
+  padding: 30px;
+  margin-bottom: 30px;
+  min-height: 300px;
+}
+
+.table-section {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.hand {
+  text-align: center;
+  flex: 1;
+  min-width: 200px;
+}
+
+.hand h3 {
+  font-size: 1.3rem;
+  margin-bottom: 15px;
+  color: #FFD700;
+}
+
+.cards {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  min-height: 80px;
+  align-items: center;
+}
+
+.card {
+  width: 60px;
+  height: 80px;
+  background: white;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: #333;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.total {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #FFD700;
+}
+
+.result-message {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 20px 0;
+  padding: 15px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.winner-player {
+  color: #4CAF50;
+}
+
+.winner-banker {
+  color: #f44336;
+}
+
+.winner-tie {
+  color: #FFC107;
+}
+
+.betting-section {
+  margin-bottom: 30px;
+}
+
+.betting-section h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+}
+
+.bet-options {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.bet-button {
+  padding: 15px 30px;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s;
+  min-width: 120px;
+}
+
+.bet-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.bet-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.bet-player {
+  background: #4CAF50;
+  color: white;
+}
+
+.bet-banker {
+  background: #f44336;
+  color: white;
+}
+
+.bet-tie {
+  background: #FFC107;
+  color: #333;
+}
+
+.bet-player.selected {
+  border: 4px solid #FFD700;
+}
+
+.bet-banker.selected {
+  border: 4px solid #FFD700;
+}
+
+.bet-tie.selected {
+  border: 4px solid #FFD700;
+}
+
+.bet-amount {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.bet-amount input {
+  padding: 10px 20px;
+  font-size: 1.2rem;
+  border-radius: 10px;
+  border: 2px solid #ddd;
+  width: 200px;
+  text-align: center;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.action-button {
+  padding: 15px 40px;
+  font-size: 1.2rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s;
+}
+
+.action-button:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+.action-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.deal-button {
+  background: #2196F3;
+  color: white;
+}
+
+.cheat-button {
+  background: #9C27B0;
+  color: white;
+}
+
+.next-button {
+  background: #4CAF50;
+  color: white;
+}
+
+.ranking-section {
+  margin-top: 30px;
+}
+
+.ranking-section h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 2rem;
+}
+
+.ranking-table {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.ranking-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ranking-table th,
+.ranking-table td {
+  padding: 15px;
+  text-align: center;
+}
+
+.ranking-table th {
+  background: rgba(0, 0, 0, 0.3);
+  font-weight: bold;
+}
+
+.ranking-table tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.name-input {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.name-input input {
+  padding: 10px 20px;
+  font-size: 1.1rem;
+  border-radius: 10px;
+  border: 2px solid #ddd;
+  margin-right: 10px;
+}
+
+.submit-score-button {
+  padding: 10px 30px;
+  font-size: 1.1rem;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.game-over {
+  text-align: center;
+  padding: 40px;
+  background: rgba(244, 67, 54, 0.2);
+  border-radius: 15px;
+  margin: 20px 0;
+}
+
+.game-over h2 {
+  font-size: 2.5rem;
+  color: #f44336;
+  margin-bottom: 20px;
+}
+
+.restart-button {
+  padding: 15px 40px;
+  font-size: 1.2rem;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s;
+}
+
+.restart-button:hover {
+  transform: scale(1.05);
+}
+
+.cheat-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.cheat-content {
+  background: #1e3c72;
+  padding: 40px;
+  border-radius: 20px;
+  text-align: center;
+  max-width: 500px;
+}
+
+.cheat-content h2 {
+  margin-bottom: 20px;
+  font-size: 2rem;
+}
+
+.cheat-content p {
+  margin-bottom: 30px;
+  font-size: 1.1rem;
+}
+
+.cheat-options {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.cheat-option-button {
+  padding: 15px 30px;
+  font-size: 1.2rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s;
+}
+
+.cancel-button {
+  background: #757575;
+  color: white;
+  padding: 10px 30px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
