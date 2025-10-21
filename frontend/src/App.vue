@@ -275,6 +275,13 @@ export default {
         this.gameResult = response.data.result;
         this.balance += response.data.netProfit;
 
+        // Reset card reveal state
+        this.revealedCards = { player: [], banker: [] };
+        this.allCardsRevealed = false;
+
+        console.log('Game result received:', this.gameResult);
+        console.log('Revealed cards reset:', this.revealedCards);
+
         this.roundHistory.push({
           round: this.currentRound,
           bet: this.selectedBet,
@@ -322,6 +329,13 @@ export default {
         this.balance += response.data.netProfit;
         this.cheatAvailable = false;
 
+        // Reset card reveal state
+        this.revealedCards = { player: [], banker: [] };
+        this.allCardsRevealed = false;
+
+        console.log('Cheat game result received:', this.gameResult);
+        console.log('Revealed cards reset:', this.revealedCards);
+
         this.roundHistory.push({
           round: this.currentRound,
           bet: this.selectedBet,
@@ -354,8 +368,10 @@ export default {
     },
 
     revealCard(hand, index) {
+      console.log(`Revealing card: ${hand}[${index}]`);
       if (!this.isCardRevealed(hand, index)) {
         this.revealedCards[hand].push(index);
+        console.log('Card revealed, current state:', this.revealedCards);
         this.checkAllRevealed();
       }
     },
@@ -369,6 +385,8 @@ export default {
 
       const totalCards = this.gameResult.playerCards.length + this.gameResult.bankerCards.length;
       const revealedCount = this.revealedCards.player.length + this.revealedCards.banker.length;
+
+      console.log(`Revealing next card. Total: ${totalCards}, Revealed: ${revealedCount}`);
 
       if (revealedCount >= totalCards) {
         this.allCardsRevealed = true;
@@ -389,6 +407,7 @@ export default {
       }
 
       const nextCard = sequence[revealedCount];
+      console.log('Next card to reveal:', nextCard);
       if (nextCard) {
         this.revealCard(nextCard.hand, nextCard.index);
       }

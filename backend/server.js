@@ -204,18 +204,20 @@ app.post('/api/cheat', (req, res) => {
 
   // Helper function to generate cards that sum to a specific total
   const generateCardsForTotal = (targetTotal) => {
-    // Map value to card number based on getCardValue logic
-    // getCardValue: value = card % 13 + 1, then if > 10 return 0, if == 1 return 1, else return value
-    // Card mapping: 1→2, 2→3, ..., 8→9, 9→10(0), 10→11(0), 11→12(0), 12→13(0), 13→1
+    // getCardValue logic: value = card % 13 + 1, then if > 10 return 0, if == 1 return 1, else return value
+    // Reverse mapping:
+    // targetTotal 0 -> card value 10,11,12,13 (which become 0) -> use card=10 (gives value 11 -> 0)
+    // targetTotal 1 -> card value 1 (Ace) -> use card=13 (gives value 1)
+    // targetTotal 2-9 -> card value 2-9 -> use card=1-8 (gives value 2-9)
     let firstCard;
     if (targetTotal === 0) {
-      firstCard = 9; // Maps to value 10, which becomes 0
+      firstCard = 10; // card % 13 + 1 = 11, which is > 10, returns 0
     } else if (targetTotal === 1) {
-      firstCard = 13; // Maps to value 1 (Ace)
+      firstCard = 13; // card % 13 + 1 = 1, returns 1
     } else {
-      firstCard = targetTotal - 1; // For 2-9: card = value - 1
+      firstCard = targetTotal - 1; // For 2-9: card = targetTotal - 1
     }
-    const secondCard = 9; // Maps to value 0 in baccarat
+    const secondCard = 10; // Always 0 value
     return [firstCard, secondCard];
   };
 
