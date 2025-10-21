@@ -147,6 +147,15 @@ app.post('/api/play', (req, res) => {
   const payout = calculatePayout(bet, result);
   const netProfit = payout - bet.amount;
 
+  // Debug logging
+  console.log('Game Result:', {
+    playerCards: result.playerCards,
+    bankerCards: result.bankerCards,
+    playerTotal: result.playerTotal,
+    bankerTotal: result.bankerTotal,
+    winner: result.winner
+  });
+
   res.json({
     result,
     payout,
@@ -193,23 +202,44 @@ app.post('/api/cheat', (req, res) => {
     return res.status(400).json({ error: 'Invalid cheat parameter' });
   }
 
+  // Helper function to generate cards that sum to a specific total
+  const generateCardsForTotal = (targetTotal) => {
+    // Map value to card number based on getCardValue logic
+    // getCardValue: value = card % 13 + 1, then if > 10 return 0, if == 1 return 1, else return value
+    // Card mapping: 1→2, 2→3, ..., 8→9, 9→10(0), 10→11(0), 11→12(0), 12→13(0), 13→1
+    let firstCard;
+    if (targetTotal === 0) {
+      firstCard = 9; // Maps to value 10, which becomes 0
+    } else if (targetTotal === 1) {
+      firstCard = 13; // Maps to value 1 (Ace)
+    } else {
+      firstCard = targetTotal - 1; // For 2-9: card = value - 1
+    }
+    const secondCard = 9; // Maps to value 0 in baccarat
+    return [firstCard, secondCard];
+  };
+
   // Generate a result that guarantees the desired winner
   let playerTotal, bankerTotal;
+  let playerCards, bankerCards;
 
   if (desiredWinner === 'player') {
     playerTotal = 9;
     bankerTotal = Math.floor(Math.random() * 9);
+    playerCards = generateCardsForTotal(playerTotal);
+    bankerCards = generateCardsForTotal(bankerTotal);
   } else if (desiredWinner === 'banker') {
     bankerTotal = 9;
     playerTotal = Math.floor(Math.random() * 9);
+    playerCards = generateCardsForTotal(playerTotal);
+    bankerCards = generateCardsForTotal(bankerTotal);
   } else {
     const total = Math.floor(Math.random() * 10);
     playerTotal = total;
     bankerTotal = total;
+    playerCards = generateCardsForTotal(playerTotal);
+    bankerCards = generateCardsForTotal(bankerTotal);
   }
-
-  const playerCards = [playerTotal, 0];
-  const bankerCards = [bankerTotal, 0];
 
   const result = {
     playerCards,
