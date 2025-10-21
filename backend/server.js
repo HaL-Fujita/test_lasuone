@@ -24,40 +24,44 @@ const calculateTotal = (cards) => {
 };
 
 // Determine if third card is needed - Official Baccarat Rules
+// 3枚目のカードを引くルール（公式バカラルール）
 const needsThirdCard = (playerTotal, bankerTotal, playerThirdCardValue = null) => {
   const result = { player: false, banker: false };
 
-  // Player's third card rule
-  // Player draws on 0-5, stands on 6-7, natural on 8-9
+  // Player's third card rule - プレイヤー側の行動
+  // 0-5: ヒット（3枚目を引く）
+  // 6-7: スタンド（引かない）
+  // 8-9: ナチュラル（この関数は呼ばれない）
   if (playerTotal <= 5) {
     result.player = true;
   }
 
-  // Banker's third card rule
+  // Banker's third card rule - バンカー側の行動
   if (!result.player) {
-    // If player didn't draw, banker draws on 0-5, stands on 6-7
+    // プレイヤーが3枚目を引かなかった場合
+    // バンカー0-5: ヒット、6-7: スタンド
     if (bankerTotal <= 5) {
       result.banker = true;
     }
   } else if (playerThirdCardValue !== null) {
-    // If player drew third card, banker follows complex rules based on player's third card
+    // プレイヤーが3枚目を引いた場合、バンカーはプレイヤーの3枚目の値によって判断
     if (bankerTotal <= 2) {
-      // Banker draws on 0-2
+      // バンカー0-2: 必ずヒット
       result.banker = true;
     } else if (bankerTotal === 3) {
-      // Banker draws on 3 unless player's third card is 8
+      // バンカー3: プレイヤーの3枚目が8以外ならヒット
       result.banker = playerThirdCardValue !== 8;
     } else if (bankerTotal === 4) {
-      // Banker draws on 4 if player's third card is 2-7
+      // バンカー4: プレイヤーの3枚目が2-7ならヒット
       result.banker = playerThirdCardValue >= 2 && playerThirdCardValue <= 7;
     } else if (bankerTotal === 5) {
-      // Banker draws on 5 if player's third card is 4-7
+      // バンカー5: プレイヤーの3枚目が4-7ならヒット
       result.banker = playerThirdCardValue >= 4 && playerThirdCardValue <= 7;
     } else if (bankerTotal === 6) {
-      // Banker draws on 6 if player's third card is 6-7
+      // バンカー6: プレイヤーの3枚目が6-7ならヒット
       result.banker = playerThirdCardValue >= 6 && playerThirdCardValue <= 7;
     }
-    // Banker stands on 7
+    // バンカー7: 必ずスタンド
   }
 
   return result;
@@ -80,6 +84,7 @@ const playRound = (cheatResult = null) => {
   let bankerTotal = calculateTotal(bankerCards);
 
   // Natural win check (8 or 9)
+  // ナチュラル8または9が出た場合、その時点で勝負が決まる
   if (playerTotal >= 8 || bankerTotal >= 8) {
     return determineWinner(playerCards, bankerCards, playerTotal, bankerTotal);
   }
