@@ -23,33 +23,41 @@ const calculateTotal = (cards) => {
   return cards.reduce((sum, card) => sum + getCardValue(card), 0) % 10;
 };
 
-// Determine if third card is needed
-const needsThirdCard = (playerTotal, bankerTotal, playerCards, bankerCards) => {
+// Determine if third card is needed - Official Baccarat Rules
+const needsThirdCard = (playerTotal, bankerTotal, playerThirdCardValue = null) => {
   const result = { player: false, banker: false };
 
   // Player's third card rule
+  // Player draws on 0-5, stands on 6-7, natural on 8-9
   if (playerTotal <= 5) {
     result.player = true;
   }
 
   // Banker's third card rule
   if (!result.player) {
+    // If player didn't draw, banker draws on 0-5, stands on 6-7
     if (bankerTotal <= 5) {
       result.banker = true;
     }
-  } else {
-    // If player drew third card, banker follows complex rules
+  } else if (playerThirdCardValue !== null) {
+    // If player drew third card, banker follows complex rules based on player's third card
     if (bankerTotal <= 2) {
+      // Banker draws on 0-2
       result.banker = true;
     } else if (bankerTotal === 3) {
-      result.banker = true; // Always draw on 3 (simplified)
+      // Banker draws on 3 unless player's third card is 8
+      result.banker = playerThirdCardValue !== 8;
     } else if (bankerTotal === 4) {
-      result.banker = true; // Draw on 4 (simplified)
+      // Banker draws on 4 if player's third card is 2-7
+      result.banker = playerThirdCardValue >= 2 && playerThirdCardValue <= 7;
     } else if (bankerTotal === 5) {
-      result.banker = true; // Draw on 5 (simplified)
+      // Banker draws on 5 if player's third card is 4-7
+      result.banker = playerThirdCardValue >= 4 && playerThirdCardValue <= 7;
     } else if (bankerTotal === 6) {
-      result.banker = true; // Draw on 6 (simplified)
+      // Banker draws on 6 if player's third card is 6-7
+      result.banker = playerThirdCardValue >= 6 && playerThirdCardValue <= 7;
     }
+    // Banker stands on 7
   }
 
   return result;
@@ -76,15 +84,21 @@ const playRound = (cheatResult = null) => {
     return determineWinner(playerCards, bankerCards, playerTotal, bankerTotal);
   }
 
-  // Third card rules
-  const thirdCardNeeded = needsThirdCard(playerTotal, bankerTotal, playerCards, bankerCards);
+  // Third card rules - Player first
+  let playerThirdCardValue = null;
+  const playerNeedsThird = needsThirdCard(playerTotal, bankerTotal, null);
 
-  if (thirdCardNeeded.player) {
-    playerCards.push(drawCard());
+  if (playerNeedsThird.player) {
+    const playerThirdCard = drawCard();
+    playerCards.push(playerThirdCard);
+    playerThirdCardValue = getCardValue(playerThirdCard);
     playerTotal = calculateTotal(playerCards);
   }
 
-  if (thirdCardNeeded.banker) {
+  // Banker's third card decision (depends on player's third card)
+  const bankerNeedsThird = needsThirdCard(playerTotal, bankerTotal, playerThirdCardValue);
+
+  if (bankerNeedsThird.banker) {
     bankerCards.push(drawCard());
     bankerTotal = calculateTotal(bankerCards);
   }
