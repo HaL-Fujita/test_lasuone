@@ -14,7 +14,8 @@ let rankings = [];
 // Card values for Baccarat (1-13 for A-K)
 const getCardValue = (card) => {
   const value = card % 13 + 1;
-  return value > 10 ? 0 : value === 1 ? 1 : value;
+  // A=1, 2-9=face value, 10/J/Q/K=0
+  return value >= 10 ? 0 : value;
 };
 
 // Calculate hand total (modulo 10)
@@ -204,20 +205,21 @@ app.post('/api/cheat', (req, res) => {
 
   // Helper function to generate cards that sum to a specific total
   const generateCardsForTotal = (targetTotal) => {
-    // getCardValue logic: value = card % 13 + 1, then if > 10 return 0, if == 1 return 1, else return value
+    // getCardValue logic: value = card % 13 + 1, then if >= 10 return 0, else return value
     // Reverse mapping:
-    // targetTotal 0 -> card value 10,11,12,13 (which become 0) -> use card=10 (gives value 11 -> 0)
-    // targetTotal 1 -> card value 1 (Ace) -> use card=13 (gives value 1)
-    // targetTotal 2-9 -> card value 2-9 -> use card=1-8 (gives value 2-9)
+    // targetTotal 0 -> need card value 10,11,12,13 -> use card=9 (9%13+1=10 -> 0)
+    // targetTotal 1 -> need card value 1 (Ace) -> use card=13 (13%13+1=1 -> 1)
+    // targetTotal 2 -> need card value 2 -> use card=1 (1%13+1=2 -> 2)
+    // targetTotal 3-9 -> need card value 3-9 -> use card=2-8
     let firstCard;
     if (targetTotal === 0) {
-      firstCard = 10; // card % 13 + 1 = 11, which is > 10, returns 0
+      firstCard = 9; // 9 % 13 + 1 = 10, which is >= 10, returns 0
     } else if (targetTotal === 1) {
-      firstCard = 13; // card % 13 + 1 = 1, returns 1
+      firstCard = 13; // 13 % 13 + 1 = 1, returns 1
     } else {
       firstCard = targetTotal - 1; // For 2-9: card = targetTotal - 1
     }
-    const secondCard = 10; // Always 0 value
+    const secondCard = 9; // 9 % 13 + 1 = 10, which is >= 10, returns 0
     return [firstCard, secondCard];
   };
 
